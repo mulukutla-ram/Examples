@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="merge1Flow" doc:id="18add571-5493-4ad3-83c2-d71347a6a3da" >
+		<http:listener doc:name="Listener" doc:id="6e557fe2-fbc7-4ff3-80c3-1a60d7b0465a" config-ref="HTTP_Listener_config" path="/merge1" allowedMethods="POST" />
+		<ee:transform doc:name="Transform Message" doc:id="4942b0b7-b942-4890-a077-69654d95e4ba" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+"certificate": payload.temp.employee 
+ map(empvalue) -> 
+	{
+		"id": empvalue.id,
+		"firstName": empvalue.first_name,
+		"LastName": empvalue.last_name,	
+		(payload.temp.scoreBoard filter($.id == empvalue.id)
+			map(k,v) -> {
+				"MarksBySubjectWise":
+			{
+				"Maths":k.score[0],
+				"English":k.score[1],
+				"Arts":k.score[2],
+				"Drawings":k.score[3]
+			}
+				
+			}
+		)
+}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

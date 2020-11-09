@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="merge3Flow" doc:id="b743dfd4-1aef-4185-a9bc-5f832322c6ec" >
+		<http:listener doc:name="Listener" doc:id="bd54a1e2-871d-4fe9-9fc0-075ac46a7cc6" config-ref="HTTP_Listener_config" path="merge2" allowedMethods="POST"/>
+		<ee:transform doc:name="Transform Message" doc:id="246407ad-0dbb-429d-bea2-c86045f9a53e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"certificate": payload.employee
+	filter((empl,idx) -> payload.scoreBoard.*id contains empl.id)
+	map((emp1,index) -> {
+		"id": emp1.id,
+		"firstname": emp1.first_name,
+		"lastname": emp1.last_name,
+		"MarksBySubjectWise": {
+		(payload.scoreBoard filter($.id == emp1.id)
+			map (sc) -> {
+				(sc.subjects[0]): sc.score[0],
+				(sc.subjects[1]): sc.score[1],
+				(sc.subjects[2]): sc.score[2],								
+				(sc.subjects[3]): sc.score[3]				
+			}
+		)
+		}
+	})
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

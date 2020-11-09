@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="numberFlow" doc:id="3051a39e-dd27-45ef-a212-5b60c68b1e7f" >
+		<http:listener doc:name="Listener" doc:id="a0bdfaa3-7d63-4ee1-b03a-ac19ee65a215" config-ref="HTTP_Listener_config" path="/seq/{n}" allowedMethods="POST"/>
+		<set-variable value="#[attributes.uriParams.n]" doc:name="Set Variable" doc:id="b0540643-00e1-4f21-b752-0340f0df4fac" variableName="num"/>
+		<ee:transform doc:name="Transform Message" doc:id="56a1a86b-7a36-41f4-b05e-79a7f6d6bd52" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+var a = vars.num as Number
+---
+1 to a map $
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
